@@ -1,12 +1,16 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const path = require('path');
+
 const router = express.Router();
+
+
+
 const app = express();
 
 router.use(bodyParser.json());
-
-
-
+router.use(express.urlencoded({extended:false}));
+router.use(express.static(path.join(__dirname,'../',"public")));
 
 var element =[
     {id:1,name:"Mohamed",salary:3000},
@@ -94,4 +98,22 @@ router.delete("/api/employees/",(req,res)=>{
      res.status(402).send("Bad Request 402");
 });
 
+
+router.get("/employees/index",(req,response)=>{
+    response.sendFile(path.join(__dirname,"../","views","employees.html"));
+});
+router.post("/employees/create",(req,response)=>{
+    if(req.body.id && req.body.name && req.body.salary)
+    {
+        var emp = {id:req.body.id, name:req.body.name,salary:req.body.salary};
+        console.log(emp);
+        element.push(emp);
+        response.render("employeelist",{emp:element});
+    }
+    response.send("error 404");
+});
+
+router.get("/employees/list",(req,response)=>{
+        response.render("employee",{emp:element, pageTitle:"EmployeesList"});
+});
 module.exports = router;
